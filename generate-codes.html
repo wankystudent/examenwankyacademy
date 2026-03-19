@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate Firebase Codes</title>
+</head>
+<body>
+
+<h2>Generate 100 Access Codes</h2>
+<div style="margin-bottom: 20px;">
+  <button onclick="login()">1. Login as Admin</button>
+  <button onclick="generateCodes()">2. Generate Codes</button>
+</div>
+
+<p id="status"></p>
+
+<!-- Firebase SDK (NON-MODULE VERSION pou evite erè) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+<script>
+  // 🔥 Firebase config ou
+  const firebaseConfig = {
+    apiKey: "AIzaSyB5OVn2JgnCcdjiijrK5c_5-Udr3402IFo",
+    authDomain: "gen-lang-client-0311223435.firebaseapp.com",
+    databaseURL: "https://gen-lang-client-0311223435-default-rtdb.firebaseio.com",
+    projectId: "gen-lang-client-0311223435",
+    storageBucket: "gen-lang-client-0311223435.firebasestorage.app",
+    messagingSenderId: "913272308962",
+    appId: "1:913272308962:web:e1b917b6b1981e4ddfcabb"
+  };
+
+  // Init Firebase
+  firebase.initializeApp(firebaseConfig);
+  
+  // Use the specific database ID from the app configuration
+  const databaseId = "ai-studio-5470c0fd-3e5f-45f4-bd31-4377f98e84db";
+  const db = firebase.app().firestore(databaseId);
+  const auth = firebase.auth();
+
+  async function login() {
+    const status = document.getElementById("status");
+    status.innerText = "⏳ Logging in...";
+    try {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      await auth.signInWithPopup(provider);
+      status.innerText = "✅ Logged in as: " + auth.currentUser.email;
+    } catch (error) {
+      console.error(error);
+      status.innerText = "❌ Login Error: " + error.message;
+    }
+  }
+
+  async function generateCodes() {
+    const status = document.getElementById("status");
+    
+    if (!auth.currentUser) {
+      status.innerText = "❌ Please login first!";
+      return;
+    }
+
+    status.innerText = "⏳ Generating codes...";
+
+    try {
+      for (let i = 1; i <= 100; i++) {
+        const num = String(i).padStart(4, "0");
+        const code = `WA-INF-2025-${num}`;
+
+        await db.collection("access_codes").doc(code).set({
+          code: code,
+          used: false,
+          usedBy: null,
+          usedAt: null
+        });
+      }
+
+      status.innerText = "✅ 100 codes created successfully!";
+    } catch (error) {
+      console.error(error);
+      status.innerText = "❌ Error: " + error.message;
+    }
+  }
+</script>
+
+</body>
+</html>

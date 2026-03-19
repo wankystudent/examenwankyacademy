@@ -1,0 +1,147 @@
+{
+  "entities": {
+    "users": {
+      "title": "User",
+      "description": "User profile information.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "role": { "type": "string", "enum": ["student", "admin"] },
+        "accessCode": { "type": "string" },
+        "bio": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "access_codes": {
+      "title": "Access Code",
+      "description": "Unique codes for platform access.",
+      "type": "object",
+      "properties": {
+        "code": { "type": "string" },
+        "used": { "type": "boolean" },
+        "usedBy": { "type": "string" },
+        "usedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["code", "used"]
+    },
+    "exams": {
+      "title": "Exam",
+      "description": "Exam details and questions.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "accessCode": { "type": "string" },
+        "durationMinutes": { "type": "number" },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "text": { "type": "string" },
+              "options": { "type": "array", "items": { "type": "string" } },
+              "correctOptionIndex": { "type": "number" }
+            }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "accessCode", "questions"]
+    },
+    "results": {
+      "title": "Result",
+      "description": "Student exam results and grading.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "examId": { "type": "string" },
+        "examTitle": { "type": "string" },
+        "uid": { "type": "string" },
+        "studentName": { "type": "string" },
+        "answers": { "type": "object" },
+        "score": { "type": "number" },
+        "totalQuestions": { "type": "number" },
+        "cheatingAlerts": { "type": "array", "items": { "type": "string" } },
+        "submittedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["examId", "uid", "answers"]
+    },
+    "certificates": {
+      "title": "Certificates",
+      "description": "Generated certificates for students who passed exams.",
+      "type": "object",
+      "properties": {
+        "certId": { "type": "string" },
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "score": { "type": "number" },
+        "date": { "type": "string", "format": "date-time" },
+        "language": { "type": "string", "enum": ["creole", "french", "spanish"] },
+        "course": { "type": "string" },
+        "hash": { "type": "string" },
+        "qrUrl": { "type": "string" }
+      },
+      "required": ["certId", "userId", "name", "email", "score", "date", "language", "hash"]
+    },
+    "examProgress": {
+      "title": "Exam Progress",
+      "description": "Real-time exam progress to prevent cheating and data loss.",
+      "type": "object",
+      "properties": {
+        "answers": { "type": "object" },
+        "shuffledIndices": { "type": "array", "items": { "type": "number" } },
+        "startTime": { "type": "string", "format": "date-time" },
+        "isStarted": { "type": "boolean" },
+        "isCompleted": { "type": "boolean" }
+      },
+      "required": ["shuffledIndices", "startTime"]
+    },
+    "user_exam_stats": {
+      "title": "User Exam Stats",
+      "description": "Tracks best scores and attempts for each exam per user.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "examId": { "type": "string" },
+        "examTitle": { "type": "string" },
+        "bestScore": { "type": "number" },
+        "totalQuestions": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "examId", "bestScore"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "users",
+      "description": "User profiles"
+    },
+    "/users/{userId}/examProgress/{examId}": {
+      "schema": "examProgress",
+      "description": "Real-time exam progress"
+    },
+    "/exams/{examId}": {
+      "schema": "exams",
+      "description": "Exam definitions"
+    },
+    "/results/{resultId}": {
+      "schema": "results",
+      "description": "Exam results"
+    },
+    "/user_exam_stats/{statId}": {
+      "schema": "user_exam_stats",
+      "description": "User best scores per exam"
+    },
+    "/access_codes/{codeId}": {
+      "schema": "access_codes",
+      "description": "Platform access codes"
+    }
+  }
+}
